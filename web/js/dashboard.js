@@ -206,7 +206,22 @@ function initDashboard(role) {
     // Booking Modal Helpers
     window.showAddBookingModal = function () {
         const modal = document.getElementById('bookingModal');
-        document.getElementById('bookingForm').reset();
+        const form = document.getElementById('bookingForm');
+        form.reset();
+
+        // UI Steps
+        const step1 = document.getElementById('step1_Lookup');
+        const step2 = document.getElementById('step2_GuestForm');
+        const step3 = document.getElementById('step3_Booking');
+        const modalButtons = document.getElementById('modalButtons');
+
+        // Reset Visibility
+        step1.style.display = 'block';
+        step2.style.display = 'none';
+        step3.style.display = 'none';
+        modalButtons.style.display = 'none';
+        document.getElementById('btnAddGuest').style.display = 'none';
+        document.getElementById('guestEmailSearch').disabled = false;
 
         // Populate available rooms
         const roomSelect = document.getElementById('roomSelect');
@@ -216,6 +231,90 @@ function initDashboard(role) {
                 .join('');
 
         modal.style.display = 'flex';
+
+        const btnFindGuest = document.getElementById('btnFindGuest');
+        const btnAddGuest = document.getElementById('btnAddGuest');
+        const btnChangeGuest = document.getElementById('btnChangeGuest');
+        const guestTypeLabel = document.getElementById('guestTypeLabel');
+        const guestEmailSearch = document.getElementById('guestEmailSearch');
+
+        const calculatePrice = () => {
+            const roomId = roomSelect.value;
+            const checkIn = modal.querySelector('input[name="checkInDate"]').value;
+            const checkOut = modal.querySelector('input[name="checkOutDate"]').value;
+
+            if (roomId && checkIn && checkOut) {
+                const room = state.rooms.find(r => r.id == roomId);
+                const start = new Date(checkIn);
+                const end = new Date(checkOut);
+                const diff = end - start;
+                const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+                if (nights > 0 && room) {
+                    modal.querySelector('input[name="totalPrice"]').value = (nights * room.pricePerNight).toFixed(2);
+                }
+            }
+        };
+
+        btnFindGuest.onclick = () => {
+            const email = guestEmailSearch.value;
+            if (!email) return alert('Please enter an email');
+
+            fetch(`api/users?email=${encodeURIComponent(email)}`)
+                .then(res => {
+                    if (res.ok) return res.json();
+                    throw new Error('Not found');
+                })
+                .then(user => {
+                    guestTypeLabel.innerText = 'EXISTING GUEST PROFILE';
+                    guestTypeLabel.style.color = 'var(--secondary)';
+
+                    form.querySelector('input[name="firstName"]').value = user.firstName;
+                    form.querySelector('input[name="lastName"]').value = user.lastName;
+                    form.querySelector('input[name="phone"]').value = user.phone;
+                    form.querySelector('textarea[name="address"]').value = user.address;
+
+                    [...step2.querySelectorAll('input, textarea')].forEach(el => el.readOnly = true);
+                    guestEmailSearch.disabled = true;
+
+                    step2.style.display = 'block';
+                    step3.style.display = 'block';
+                    modalButtons.style.display = 'flex';
+                    btnAddGuest.style.display = 'none';
+                })
+                .catch(() => {
+                    btnAddGuest.style.display = 'block';
+                    alert('Guest not found. Click "+ Add New" to register them.');
+                });
+        };
+
+        btnAddGuest.onclick = () => {
+            guestTypeLabel.innerText = 'NEW GUEST PROFILE';
+            guestTypeLabel.style.color = 'var(--primary)';
+
+            [...step2.querySelectorAll('input, textarea')].forEach(el => {
+                el.readOnly = false;
+                el.value = '';
+            });
+
+            guestEmailSearch.disabled = true;
+            step2.style.display = 'block';
+            step3.style.display = 'block';
+            modalButtons.style.display = 'flex';
+            btnAddGuest.style.display = 'none';
+        };
+
+        btnChangeGuest.onclick = () => {
+            guestEmailSearch.disabled = false;
+            step2.style.display = 'none';
+            step3.style.display = 'none';
+            modalButtons.style.display = 'none';
+            btnAddGuest.style.display = 'none';
+        };
+
+        roomSelect.onchange = calculatePrice;
+        modal.querySelector('input[name="checkInDate"]').onchange = calculatePrice;
+        modal.querySelector('input[name="checkOutDate"]').onchange = calculatePrice;
     }
 
     window.closeBookingModal = function () {

@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS rooms (
 -- Bookings table
 CREATE TABLE IF NOT EXISTS bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT,
     customer_name VARCHAR(100) NOT NULL,
     customer_email VARCHAR(100),
     room_id INT,
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     total_price DECIMAL(10, 2) NOT NULL,
     status ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'CHECKED_IN', 'CHECKED_OUT') DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (guest_id) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL
 );
 
@@ -66,3 +68,7 @@ INSERT INTO rooms (room_number, room_type, price_per_night, status) VALUES
 ('101', 'Deluxe Single', 150.00, 'AVAILABLE'),
 ('102', 'Deluxe Double', 250.00, 'AVAILABLE'),
 ('201', 'Ocean View Suite', 500.00, 'AVAILABLE');
+
+-- MIGRATION: Run this if your 'bookings' table already exists without 'guest_id'
+-- ALTER TABLE bookings ADD COLUMN guest_id INT AFTER id;
+-- ALTER TABLE bookings ADD FOREIGN KEY (guest_id) REFERENCES users(id) ON DELETE SET NULL;

@@ -27,6 +27,22 @@ public class UserDAO {
         return users;
     }
 
+    public User getUserByEmail(String email) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToUser(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public boolean addUser(User user) {
         String sql = "INSERT INTO users (first_name, last_name, email, phone, address) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
