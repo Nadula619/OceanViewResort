@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - OceanView</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-logo">OceanView Admin</div>
+            <nav>
+                <a class="nav-item active" data-page="overview">Overview</a>
+                <a class="nav-item" data-page="rooms">Manage Rooms</a>
+                <a class="nav-item" data-page="bookings">All Bookings</a>
+            </nav>
+            <div style="margin-top: auto;">
+                <button class="btn btn-primary" id="logoutBtn" style="width: 100%;">Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1 id="pageTitle">Overview</h1>
+                <div class="user-profile">
+                    <span id="userName">Admin</span>
+                </div>
+            </header>
+
+            <div id="overviewPage" class="page">
+                <div class="stats-grid">
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Total Rooms</div>
+                        <div class="stat-value" id="statTotalRooms">0</div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Active Bookings</div>
+                        <div class="stat-value" id="statActiveBookings">0</div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Revenue (MTD)</div>
+                        <div class="stat-value" id="statRevenue">$0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="roomsPage" class="page" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Room Inventory</h2>
+                    <button class="btn btn-primary" onclick="showAddRoomModal()">+ Add New Room</button>
+                </div>
+                <div class="glass-card data-table-container">
+                    <table id="roomsTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="bookingsPage" class="page" style="display: none;">
+                <h2>Master Booking List</h2>
+                <div class="glass-card data-table-container">
+                    <table id="bookingsTable">
+                        <thead>
+                            <tr>
+                                <th>Guest</th>
+                                <th>Room</th>
+                                <th>Dates</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="roomModal" class="modal">
+        <div class="glass-card modal-content">
+            <h2 id="modalTitle">Add Room</h2>
+            <form id="roomForm" style="margin-top: 20px;">
+                <input type="hidden" name="id">
+                <input type="text" name="roomNumber" placeholder="Room Number (e.g. 101)" class="input-field" required>
+                <select name="roomType" class="input-field">
+                    <option value="Deluxe Single">Deluxe Single</option>
+                    <option value="Deluxe Double">Deluxe Double</option>
+                    <option value="Ocean View Suite">Ocean View Suite</option>
+                </select>
+                <input type="number" name="price" placeholder="Price per Night" class="input-field" required>
+                <select name="status" class="input-field">
+                    <option value="AVAILABLE">Available</option>
+                    <option value="OCCUPIED">Occupied</option>
+                    <option value="MAINTENANCE">Maintenance</option>
+                </select>
+                <textarea name="description" placeholder="Description" class="input-field"></textarea>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save Room</button>
+                    <button type="button" class="btn" onclick="closeRoomModal()"
+                        style="flex: 1; background: var(--glass);">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script>
+        initDashboard('ADMIN');
+    </script>
+</body>
+
+</html>
