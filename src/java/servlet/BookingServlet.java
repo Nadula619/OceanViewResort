@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Booking;
 
-@WebServlet(name = "BookingServlet", urlPatterns = {"/api/bookings"})
+@WebServlet(name = "BookingServlet", urlPatterns = { "/api/bookings" })
 public class BookingServlet extends HttpServlet {
     private BookingDAO bookingDAO = new BookingDAO();
     private Gson gson = new Gson();
@@ -30,7 +30,25 @@ public class BookingServlet extends HttpServlet {
         String action = request.getParameter("action");
         boolean success = false;
 
-        if ("updateStatus".equals(action)) {
+        if ("add".equals(action)) {
+            Booking booking = new Booking();
+            booking.setFirstName(request.getParameter("firstName"));
+            booking.setLastName(request.getParameter("lastName"));
+            booking.setEmail(request.getParameter("email"));
+            booking.setPhone(request.getParameter("phone"));
+            booking.setAddress(request.getParameter("address"));
+            booking.setRoomId(Integer.parseInt(request.getParameter("roomId")));
+            try {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                booking.setCheckInDate(sdf.parse(request.getParameter("checkInDate")));
+                booking.setCheckOutDate(sdf.parse(request.getParameter("checkOutDate")));
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+            }
+            booking.setTotalPrice(Double.parseDouble(request.getParameter("totalPrice")));
+            booking.setStatus("CONFIRMED");
+            success = bookingDAO.addBooking(booking);
+        } else if ("updateStatus".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
             String status = request.getParameter("status");
             success = bookingDAO.updateBookingStatus(id, status);

@@ -23,6 +23,9 @@ public class AuthServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
         PrintWriter out = response.getWriter();
         Map<String, Object> result = new HashMap<>();
 
@@ -44,7 +47,10 @@ public class AuthServlet extends HttpServlet {
                 result.put("message", "Invalid username or password");
             }
         } else if ("logout".equals(action)) {
-            request.getSession().invalidate();
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
             result.put("success", true);
         }
 
@@ -55,6 +61,9 @@ public class AuthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
         PrintWriter out = response.getWriter();
         HttpSession session = request.getSession(false);
         Staff staff = (session != null) ? (Staff) session.getAttribute("user") : null;

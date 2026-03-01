@@ -48,18 +48,30 @@ function initDashboard(role) {
         .then(res => res.json())
         .then(data => {
             if (!data.loggedIn || data.role !== role) {
-                window.location.href = 'login.html';
+                window.location.replace('login.html');
             } else {
                 userName.innerText = data.name;
                 updateOverview();
             }
+        })
+        .catch(() => {
+            window.location.replace('login.html');
         });
 
     // Logout
-    document.getElementById('logoutBtn').onclick = () => {
-        fetch('api/auth?action=logout', { method: 'POST' })
-            .then(() => window.location.href = 'login.html');
-    };
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.onclick = () => {
+            fetch('api/auth?action=logout', { method: 'POST' })
+                .then(() => {
+                    window.location.replace('login.html');
+                })
+                .catch(err => {
+                    console.error('Logout failed:', err);
+                    window.location.replace('login.html'); // Redirect anyway
+                });
+        };
+    }
 
     // Data Loading
     window.loadRooms = function () {
@@ -89,7 +101,7 @@ function initDashboard(role) {
             <tr>
                 <td>${room.roomNumber}</td>
                 <td>${room.roomType}</td>
-                <td>$${room.pricePerNight}</td>
+                <td>LKR ${room.pricePerNight}</td>
                 <td><span class="badge ${getStatusBadgeClass(room.status)}">${room.status}</span></td>
                 <td>
                     ${role === 'ADMIN' ? `
@@ -125,7 +137,7 @@ function initDashboard(role) {
                 <td>
                     ${role === 'RECEPTIONIST' ? `
                         <button class="btn btn-primary" onclick="updateBookingStatus(${booking.id}, 'CHECKED_IN')" style="padding: 5px 10px;">Check In</button>
-                    ` : `$${booking.totalPrice}`}
+                    ` : `LKR ${booking.totalPrice}`}
                 </td>
             </tr>
         `).join('');
@@ -136,7 +148,7 @@ function initDashboard(role) {
             document.getElementById('statTotalRooms').innerText = state.rooms.length;
             document.getElementById('statActiveBookings').innerText = state.bookings.filter(b => b.status === 'CONFIRMED' || b.status === 'CHECKED_IN').length;
             const revenue = state.bookings.reduce((sum, b) => sum + b.totalPrice, 0);
-            document.getElementById('statRevenue').innerText = '$' + revenue.toFixed(2);
+            document.getElementById('statRevenue').innerText = 'LKR ' + revenue.toFixed(2);
         } else {
             document.getElementById('statAvailable').innerText = state.rooms.filter(r => r.status === 'AVAILABLE').length;
             document.getElementById('statArrivals').innerText = state.bookings.filter(b => b.status === 'CONFIRMED').length;
@@ -186,6 +198,50 @@ function initDashboard(role) {
                     if (data.success) {
                         closeRoomModal();
                         loadRooms();
+                    }
+                });
+        };
+    }
+
+    // Booking Modal Helpers
+    window.showAddBookingModal = function () {
+        const modal = document.getElementById('bookingModal');
+        document.getElementById('bookingForm').reset();
+
+        // Populate available rooms
+        const roomSelect = document.getElementById('roomSelect');
+        roomSelect.innerHTML = '<option value="">Select Room</option>' +
+            state.rooms.filter(r => r.status === 'AVAILABLE')
+                .map(r => `<option value="${r.id}">${r.roomNumber} - ${r.roomType} (LKR ${r.pricePerNight})</option>`)
+                .join('');
+
+        modal.style.display = 'flex';
+    }
+
+    window.closeBookingModal = function () {
+        document.getElementById('bookingModal').style.display = 'none';
+    }
+
+    const bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.onsubmit = function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const params = new URLSearchParams();
+            params.append('action', 'add');
+            for (let pair of formData.entries()) params.append(pair[0], pair[1]);
+
+            fetch('api/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        closeBookingModal();
+                        loadBookings();
+                        loadRooms(); // Refresh to show room as occupied if logic exists
                     }
                 });
         };

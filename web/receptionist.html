@@ -16,7 +16,7 @@
             <nav>
                 <a class="nav-item active" data-page="overview">Overview</a>
                 <a class="nav-item" data-page="availability">Room Availability</a>
-                <a class="nav-item" data-page="bookings">Manage Bookings</a>
+                <a class="nav-item" data-page="bookings">Check-ins</a>
             </nav>
             <div style="margin-top: auto;">
                 <button class="btn btn-primary" id="logoutBtn" style="width: 100%;">Logout</button>
@@ -67,7 +67,10 @@
             </div>
 
             <div id="bookingsPage" class="page" style="display: none;">
-                <h2>Booking Operations</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Check-in Operations</h2>
+                    <button class="btn btn-primary" onclick="showAddBookingModal()">+ New Check-in</button>
+                </div>
                 <div class="glass-card data-table-container">
                     <table id="bookingsTable">
                         <thead>
@@ -84,6 +87,45 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="bookingModal" class="modal">
+        <div class="glass-card modal-content">
+            <h2 id="bookingModalTitle">New Check-in</h2>
+            <form id="bookingForm" style="margin-top: 20px;">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="firstName" placeholder="First Name" class="input-field" required
+                        style="flex: 1;">
+                    <input type="text" name="lastName" placeholder="Last Name" class="input-field" required
+                        style="flex: 1;">
+                </div>
+                <input type="email" name="email" placeholder="Email Address" class="input-field" required>
+                <input type="text" name="phone" placeholder="Phone Number" class="input-field" required>
+                <textarea name="address" placeholder="Residential Address" class="input-field"
+                    style="min-height: 60px;"></textarea>
+
+                <select name="roomId" id="roomSelect" class="input-field" required>
+                    <option value="">Select Room</option>
+                </select>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; color: var(--text-muted);">Check-in Date</label>
+                        <input type="date" name="checkInDate" class="input-field" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; color: var(--text-muted);">Check-out Date</label>
+                        <input type="date" name="checkOutDate" class="input-field" required>
+                    </div>
+                </div>
+                <input type="number" name="totalPrice" placeholder="Total Price (LKR)" class="input-field" required>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Create Booking</button>
+                    <button type="button" class="btn" onclick="closeBookingModal()"
+                        style="flex: 1; background: var(--glass);">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="js/dashboard.js"></script>
