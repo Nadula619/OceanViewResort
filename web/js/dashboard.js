@@ -378,10 +378,22 @@ function initDashboard(role) {
 
         // Load Rooms
         if (roomSelect) {
-            roomSelect.innerHTML = '<option value="">Select Room...</option>' +
-                state.rooms.filter(r => r.status === 'AVAILABLE')
-                    .map(r => `<option value="${r.id}">${r.roomNumber} - ${r.roomType} (LKR ${r.pricePerNight})</option>`)
-                    .join('');
+            roomSelect.innerHTML = '<option value="">Loading available rooms...</option>';
+            fetch('api/rooms')
+                .then(res => res.json())
+                .then(rooms => {
+                    const availableRooms = rooms.filter(r => r.status === 'AVAILABLE');
+                    if (availableRooms.length === 0) {
+                        roomSelect.innerHTML = '<option value="">No rooms available</option>';
+                    } else {
+                        roomSelect.innerHTML = '<option value="">Select Room...</option>' +
+                            availableRooms.map(r => `<option value="${r.id}">${r.roomNumber} - ${r.roomType} (LKR ${r.pricePerNight})</option>`).join('');
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to load rooms for booking:', err);
+                    roomSelect.innerHTML = '<option value="">Error loading rooms</option>';
+                });
         }
 
         // Search Functionality
