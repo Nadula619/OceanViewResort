@@ -18,6 +18,7 @@
                 <a class="nav-item" data-page="rooms">Room Availability</a>
                 <a class="nav-item" data-page="bookings">All Bookings</a>
                 <a class="nav-item" data-page="payments">Payments History</a>
+                <a class="nav-item" data-page="help">Help & Guidelines</a>
                 <a class="nav-item" data-page="new-booking" onclick="showAddBookingModal()">+ New Booking</a>
             </nav>
             <div style="margin-top: auto;">
@@ -196,7 +197,81 @@
                 </div>
             </div>
 
-            <!-- Booking Modal (Simplified) -->
+            <!-- Help Page -->
+            <div id="helpPage" class="page" style="display: none;">
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <div class="glass-card"
+                        style="padding: 30px; margin-bottom: 25px; border-left: 5px solid var(--primary);">
+                        <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <span>📖</span> System User Guide
+                        </h2>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Follow these guidelines to manage the
+                            OceanView Resort Reservation System efficiently.</p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                        <!-- Room Management -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <h3
+                                style="color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>🏨</span> Room Management
+                            </h3>
+                            <ul style="padding-left: 20px; line-height: 1.6; color: rgba(255,255,255,0.85);">
+                                <li>Monitor current occupancy in the <strong>Overview</strong> tab.</li>
+                                <li>Use <strong>Room Availability</strong> to check which rooms are ready for new
+                                    guests.</li>
+                                <li>Update room status to <strong>MAINTENANCE</strong> if a room needs cleaning or
+                                    repairs.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Booking Workflow -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <h3
+                                style="color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>📝</span> Guest Bookings
+                            </h3>
+                            <ul style="padding-left: 20px; line-height: 1.6; color: rgba(255,255,255,0.85);">
+                                <li>Click <strong>+ New Booking</strong> to start the registration process.</li>
+                                <li>Search for <strong>Existing Guests</strong> by name or email to save time.</li>
+                                <li>Register new guests by filling out their ID/Passport and contact details.</li>
+                                <li>Total price is calculated automatically based on the room rate and stay duration.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Payments & Billing -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <h3
+                                style="color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>💳</span> Payments & Billing
+                            </h3>
+                            <ul style="padding-left: 20px; line-height: 1.6; color: rgba(255,255,255,0.85);">
+                                <li>A payment record is created <strong>automatically</strong> as soon as a booking is
+                                    confirmed.</li>
+                                <li>Go to <strong>Payments History</strong> to find any transaction.</li>
+                                <li>Search by <strong>Ref ID</strong> (Transaction ID) or Guest Name.</li>
+                                <li>Click <strong>Generate Bill</strong> to view and print the official invoice for the
+                                    guest.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Support -->
+                        <div class="glass-card" style="padding: 25px; background: rgba(37, 99, 235, 0.05);">
+                            <h3
+                                style="color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>🆘</span> System Support
+                            </h3>
+                            <p style="color: rgba(255,255,255,0.85);">If you encounter technical issues or need access
+                                to restricted features, please contact the <strong>System Administrator</strong>.</p>
+                            <div style="margin-top: 15px; font-size: 13px; color: var(--text-muted);">
+                                <strong>Note:</strong> Log out at the end of your shift to ensure security.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="bookingModal" class="modal">
                 <div class="glass-card modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
                     <div
