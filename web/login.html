@@ -99,8 +99,12 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        if (data.role === 'ADMIN') window.location.href = 'admin.html';
-                        else window.location.href = 'receptionist.html';
+                        console.log('Login successful. Role:', data.role);
+                        const role = data.role ? data.role.toUpperCase() : '';
+                        if (role === 'ADMIN') window.location.href = 'admin.html';
+                        else if (role === 'RECEPTIONIST') window.location.href = 'receptionist.html';
+                        else document.getElementById('message').innerText = 'Access denied: Your role (' + data.role + ') does not have dashboard access.';
+
                     } else {
                         document.getElementById('message').innerText = data.message || 'Login failed';
                     }

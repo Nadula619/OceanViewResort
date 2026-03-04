@@ -10,6 +10,7 @@ public class Booking {
     private String phone;
     private String address;
     private int roomId;
+    private String roomNumber;
     private Date checkInDate;
     private Date checkOutDate;
     private double totalPrice;
@@ -92,6 +93,14 @@ public class Booking {
 
     public void setRoomId(int roomId) {
         this.roomId = roomId;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
     }
 
     public Date getCheckInDate() {

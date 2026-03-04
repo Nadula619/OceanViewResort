@@ -3,6 +3,7 @@ package servlet;
 import com.google.gson.Gson;
 import dao.UserDAO;
 import java.io.IOException;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,8 +31,7 @@ public class UserServlet extends HttpServlet {
                 response.getWriter().print("{\"message\": \"User not found\"}");
             }
         } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().print("{\"message\": \"Email is required\"}");
+            response.getWriter().print(gson.toJson(userDAO.getAllUsers()));
         }
     }
 }

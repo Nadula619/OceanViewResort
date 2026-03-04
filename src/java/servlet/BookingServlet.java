@@ -29,32 +29,55 @@ public class BookingServlet extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         boolean success = false;
+        String message = "";
 
-        if ("add".equals(action)) {
-            Booking booking = new Booking();
-            booking.setFirstName(request.getParameter("firstName"));
-            booking.setLastName(request.getParameter("lastName"));
-            booking.setEmail(request.getParameter("email"));
-            booking.setPhone(request.getParameter("phone"));
-            booking.setAddress(request.getParameter("address"));
-            booking.setRoomId(Integer.parseInt(request.getParameter("roomId")));
-            try {
-                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                booking.setCheckInDate(sdf.parse(request.getParameter("checkInDate")));
-                booking.setCheckOutDate(sdf.parse(request.getParameter("checkOutDate")));
-            } catch (java.text.ParseException e) {
-                e.printStackTrace();
+        try {
+            if ("add".equals(action)) {
+                Booking booking = new Booking();
+                booking.setFirstName(request.getParameter("first_name"));
+                booking.setLastName(request.getParameter("last_name"));
+                booking.setEmail(request.getParameter("email"));
+                booking.setPhone(request.getParameter("phone"));
+                booking.setAddress(request.getParameter("address"));
+                booking.setRoomId(Integer.parseInt(request.getParameter("roomId")));
+
+                try {
+                    String ci = request.getParameter("checkInDate");
+                    String co = request.getParameter("checkOutDate");
+                    if (ci == null || ci.isEmpty() || co == null || co.isEmpty()) {
+                        throw new Exception("Check-in and Check-out dates are required.");
+                    }
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                    booking.setCheckInDate(sdf.parse(ci));
+                    booking.setCheckOutDate(sdf.parse(co));
+                } catch (java.text.ParseException e) {
+                    throw new Exception("Invalid date format. Please use YYYY-MM-DD.");
+                }
+
+                String priceStr = request.getParameter("totalPrice");
+                if (priceStr == null || priceStr.isEmpty()) {
+                    throw new Exception("Total price is missing.");
+                }
+                booking.setTotalPrice(Double.parseDouble(priceStr));
+                booking.setStatus("CONFIRMED");
+
+                bookingDAO.addBooking(booking);
+                success = true;
+                message = "Booking confirmed successfully.";
+            } else if ("updateStatus".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String status = request.getParameter("status");
+                success = bookingDAO.updateBookingStatus(id, status);
+                message = success ? "Status updated." : "Failed to update status.";
             }
-            booking.setTotalPrice(Double.parseDouble(request.getParameter("totalPrice")));
-            booking.setStatus("CONFIRMED");
-            success = bookingDAO.addBooking(booking);
-        } else if ("updateStatus".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String status = request.getParameter("status");
-            success = bookingDAO.updateBookingStatus(id, status);
+        } catch (Exception e) {
+            e.printStackTrace();
+            success = false;
+            message = e.getMessage() != null ? e.getMessage() : "An unexpected error occurred.";
         }
 
         response.setContentType("application/json");
-        response.getWriter().print("{\"success\":" + success + "}");
+        response.getWriter()
+                .print("{\"success\":" + success + ", \"message\": \"" + message.replace("\"", "\\\"") + "\"}");
     }
 }
