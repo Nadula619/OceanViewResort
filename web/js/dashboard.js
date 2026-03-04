@@ -8,14 +8,15 @@ function initDashboard(role) {
         bookings: [],
         guests: [],
         staff: [],
-        payments: []
+        payments: [],
+        currentUserId: null
     };
 
     // --- Helper Functions ---
     function getStatusBadgeClass(status) {
-        if (['AVAILABLE', 'CONFIRMED', 'CHECKED_IN'].includes(status)) return 'badge-success';
+        if (['AVAILABLE', 'CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT'].includes(status)) return 'badge-success';
         if (['OCCUPIED', 'PENDING'].includes(status)) return 'badge-warning';
-        if (status === 'COMPLETED' || status === 'CANCELLED') return 'badge-danger';
+        if (status === 'CANCELLED' || status === 'COMPLETED') return 'badge-danger';
         return 'badge-danger';
     }
 
@@ -34,11 +35,9 @@ function initDashboard(role) {
                 }
             } else {
                 const elAvail = document.getElementById('statAvailable');
-                const elArr = document.getElementById('statArrivals');
                 const elDep = document.getElementById('statDepartures');
 
                 if (elAvail) elAvail.innerText = state.rooms.filter(r => r.status === 'AVAILABLE').length;
-                if (elArr) elArr.innerText = state.bookings.filter(b => b.status === 'CONFIRMED').length;
                 if (elDep) elDep.innerText = state.bookings.filter(b => b.status === 'CHECKED_IN').length;
             }
         } catch (e) {
@@ -134,7 +133,7 @@ function initDashboard(role) {
                             <button class="btn btn-primary" onclick="updateBookingStatus(${booking.id}, 'CHECKED_IN')" style="padding: 5px 10px;">Check In</button>
                         ` : ''}
                         ${booking.status === 'CHECKED_IN' ? `
-                            <button class="btn" onclick="updateBookingStatus(${booking.id}, 'COMPLETED')" style="background: var(--glass); padding: 5px 10px;">Check Out</button>
+                            <button class="btn" onclick="updateBookingStatus(${booking.id}, 'CHECKED_OUT')" style="background: var(--glass); padding: 5px 10px;">Check Out</button>
                         ` : ''}
                     ` : `LKR ${booking.totalPrice}`}
                 </td>
@@ -174,13 +173,24 @@ function initDashboard(role) {
         if (!payment) return;
 
         // Populate Template
-        document.getElementById('billDate').innerText = new Date(payment.paymentDate).toLocaleDateString();
+        const billDateEl = document.getElementById('billDate');
+        if (billDateEl) {
+            billDateEl.innerText = new Date().toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
         document.getElementById('billGuestName').innerText = payment.guestName;
         document.getElementById('billMethod').innerText = payment.paymentMethod;
         document.getElementById('billTxID').innerText = payment.transactionId || 'CASH-REC-' + payment.id;
         document.getElementById('billRoom').innerText = payment.roomNumber;
-        document.getElementById('billAmount').innerText = 'LKR ' + payment.amount.toLocaleString();
-        document.getElementById('billTotal').innerText = 'LKR ' + payment.amount.toLocaleString();
+
+        const formattedAmount = 'LKR ' + payment.amount.toLocaleString(undefined, { minimumFractionDigits: 2 });
+        document.getElementById('billAmount').innerText = formattedAmount;
+        document.getElementById('billSubtotal').innerText = formattedAmount;
+        document.getElementById('billTotal').innerText = formattedAmount;
 
         // Print Logic
         const printContent = document.getElementById('billTemplate').innerHTML;
@@ -211,7 +221,9 @@ function initDashboard(role) {
                 <td>${staff.username}</td>
                 <td>
                     <button class="btn" onclick="editStaff(${staff.staffId})" style="background: var(--glass); padding: 5px 10px;">Edit</button>
-                    <button class="btn" onclick="deleteStaff(${staff.staffId})" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 5px 10px;">Delete</button>
+                    ${staff.staffId !== state.currentUserId ? `
+                        <button class="btn" onclick="deleteStaff(${staff.staffId})" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 5px 10px;">Delete</button>
+                    ` : ''}
                 </td>
             </tr>
         `).join('');
@@ -639,6 +651,7 @@ function initDashboard(role) {
             if (!data.loggedIn || (data.role && data.role.toUpperCase() !== role.toUpperCase())) {
                 window.location.replace('login.html');
             } else {
+                state.currentUserId = data.staffId;
                 const userName = document.getElementById('userName');
                 if (userName) userName.innerText = data.name;
                 updateOverview();
