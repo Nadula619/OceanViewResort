@@ -160,9 +160,10 @@ function initDashboard(role) {
                 </td>
                 <td style="font-weight: 600;">LKR ${p.amount.toLocaleString()}</td>
                 <td><span class="badge" style="background: rgba(255,255,255,0.05);">${p.paymentMethod}</span></td>
+                ${state.role !== 'ADMIN' ? `
                 <td>
                     <button class="btn" onclick="generateBill(${p.id})" style="padding: 5px 12px; background: var(--primary); font-size: 12px;">Generate Bill</button>
-                </td>
+                </td>` : ''}
             </tr>
         `).join('');
     }
