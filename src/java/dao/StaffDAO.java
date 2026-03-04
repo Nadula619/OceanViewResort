@@ -7,12 +7,13 @@ import model.Staff;
 import util.DBConnection;
 
 public class StaffDAO {
-    public Staff login(String email, String password) {
-        String sql = "SELECT * FROM staff WHERE email = ? AND password = ?";
+    public Staff login(String identifier, String password) {
+        String sql = "SELECT * FROM staff WHERE (email = ? OR username = ?) AND password = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, email);
-            pstmt.setString(2, password);
+            pstmt.setString(1, identifier);
+            pstmt.setString(2, identifier);
+            pstmt.setString(3, password);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return new Staff(

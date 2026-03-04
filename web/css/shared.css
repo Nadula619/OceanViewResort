@@ -64,16 +64,36 @@ body {
     color: white;
     outline: none;
     margin-bottom: 15px;
+    cursor: pointer;
 }
 
 .input-field:focus {
     border-color: var(--primary);
 }
 
+/* Fix for dark mode dropdown options */
+select.input-field option {
+    background-color: #1e293b;
+    /* Matches var(--bg-card) solid version */
+    color: white;
+}
+
+select.input-field option:hover,
+select.input-field option:focus {
+    background-color: var(--primary);
+}
+
 /* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .fade-in {
