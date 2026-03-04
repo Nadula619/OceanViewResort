@@ -1,6 +1,6 @@
 -- Create database
-CREATE DATABASE IF NOT EXISTS ocanviewresortdb;
-USE ocanviewresortdb;
+CREATE DATABASE IF NOT EXISTS oceanviewresortdb;
+USE oceanviewresortdb;
 
 -- Staff table for authentication and profile
 CREATE TABLE IF NOT EXISTS staff (
@@ -68,6 +68,17 @@ INSERT INTO rooms (room_number, room_type, price_per_night, status) VALUES
 ('101', 'Deluxe Single', 150.00, 'AVAILABLE'),
 ('102', 'Deluxe Double', 250.00, 'AVAILABLE'),
 ('201', 'Ocean View Suite', 500.00, 'AVAILABLE');
+
+-- Payments table
+CREATE TABLE IF NOT EXISTS payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_method ENUM('CASH', 'CARD', 'ONLINE') NOT NULL,
+    transaction_id VARCHAR(100) UNIQUE,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE
+);
 
 -- MIGRATION: Run this if your 'bookings' table already exists without 'guest_id'
 -- ALTER TABLE bookings ADD COLUMN guest_id INT AFTER id;

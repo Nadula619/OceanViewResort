@@ -12,11 +12,14 @@
 <body>
     <div class="dashboard-container">
         <aside class="sidebar">
-            <div class="sidebar-logo">OceanView Front Desk</div>
+            <div class="sidebar-logo">OceanView Resort</div>
             <nav>
                 <a class="nav-item active" data-page="overview">Overview</a>
-                <a class="nav-item" data-page="availability">Room Availability</a>
-                <a class="nav-item" data-page="bookings">Check-ins</a>
+                <a class="nav-item" data-page="rooms">Room Availability</a>
+                <a class="nav-item" data-page="bookings">All Bookings</a>
+                <a class="nav-item" data-page="payments">Payments History</a>
+                <a class="nav-item" data-page="help">Help & Guidelines</a>
+                <a class="nav-item" data-page="new-booking" onclick="showAddBookingModal()">+ New Booking</a>
             </nav>
             <div style="margin-top: auto;">
                 <button class="btn btn-primary" id="logoutBtn" style="width: 100%;">Logout</button>
@@ -31,6 +34,7 @@
                 </div>
             </header>
 
+            <!-- Overview Page -->
             <div id="overviewPage" class="page">
                 <div class="stats-grid">
                     <div class="glass-card stat-card">
@@ -38,23 +42,35 @@
                         <div class="stat-value" id="statAvailable">0</div>
                     </div>
                     <div class="glass-card stat-card">
-                        <div class="stat-label">Arrivals Today</div>
+                        <div class="stat-label">Expected Arrivals</div>
                         <div class="stat-value" id="statArrivals">0</div>
                     </div>
                     <div class="glass-card stat-card">
-                        <div class="stat-label">Departures Today</div>
+                        <div class="stat-label">Active Guests</div>
                         <div class="stat-value" id="statDepartures">0</div>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="margin-top: 20px; padding: 20px;">
+                    <h3>Quick Actions</h3>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="showAddBookingModal()">Create New Booking</button>
+                        <button class="btn" onclick="switchPage('bookings')" style="background: var(--glass);">View All
+                            Bookings</button>
                     </div>
                 </div>
             </div>
 
-            <div id="availabilityPage" class="page" style="display: none;">
-                <h2>Live Room Status</h2>
+            <!-- Rooms Page -->
+            <div id="roomsPage" class="page" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Room Availability</h2>
+                </div>
                 <div class="glass-card data-table-container">
                     <table id="roomsTable">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>Room #</th>
                                 <th>Type</th>
                                 <th>Price</th>
                                 <th>Status</th>
@@ -66,11 +82,9 @@
                 </div>
             </div>
 
+            <!-- Bookings Page -->
             <div id="bookingsPage" class="page" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2>Check-in Operations</h2>
-                    <button class="btn btn-primary" onclick="showAddBookingModal()">+ New Check-in</button>
-                </div>
+                <h2>Master Booking List</h2>
                 <div class="glass-card data-table-container">
                     <table id="bookingsTable">
                         <thead>
@@ -79,91 +93,315 @@
                                 <th>Room</th>
                                 <th>Dates</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Modals -->
-    <div id="bookingModal" class="modal">
-        <div class="glass-card modal-content">
-            <h2 id="bookingModalTitle">New Check-in</h2>
-            <form id="bookingForm" style="margin-top: 20px;">
-                <!-- Step 1: Guest Lookup -->
-                <div id="step1_Lookup">
-                    <label style="font-size: 14px; font-weight: 500; margin-bottom: 8px; display: block;">Step 1: Find
-                        or Register Guest</label>
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <input type="email" name="email" id="guestEmailSearch" placeholder="Enter Guest Email"
-                            class="input-field" required style="flex: 1; margin-bottom: 0;">
-                        <button type="button" class="btn btn-primary" id="btnFindGuest">Search</button>
-                        <button type="button" class="btn" id="btnAddGuest"
-                            style="display: none; background: var(--secondary);">+ Add New</button>
-                    </div>
-                </div>
-
-                <!-- Step 2: Guest Profile (Found or New) -->
-                <div id="step2_GuestForm"
-                    style="display: none; border-top: 1px solid var(--glass); padding-top: 15px; margin-top: 15px;">
+            <!-- Payments Page -->
+            <div id="paymentsPage" class="page" style="display: none;">
+                <div class="glass-card" style="padding: 25px;">
                     <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span id="guestTypeLabel"
-                            style="font-size: 12px; font-weight: 600; color: var(--secondary);">GUEST PROFILE</span>
-                        <button type="button" id="btnChangeGuest"
-                            style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; text-decoration: underline;">Change
-                            Email</button>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" name="firstName" placeholder="First Name" class="input-field" required
-                            style="flex: 1;">
-                        <input type="text" name="lastName" placeholder="Last Name" class="input-field" required
-                            style="flex: 1;">
-                    </div>
-                    <input type="text" name="phone" placeholder="Phone Number" class="input-field" required>
-                    <textarea name="address" placeholder="Residential Address" class="input-field"
-                        style="min-height: 60px;"></textarea>
-                </div>
-
-                <!-- Step 3: Booking Details -->
-                <div id="step3_Booking"
-                    style="display: none; border-top: 1px solid var(--glass); padding-top: 15px; margin-top: 15px;">
-                    <label style="font-size: 14px; font-weight: 500; margin-bottom: 8px; display: block;">Step 2: Room &
-                        Stay Details</label>
-                    <select name="roomId" id="roomSelect" class="input-field" required>
-                        <option value="">Select Room</option>
-                    </select>
-                    <div style="display: flex; gap: 10px;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 12px; color: var(--text-muted);">Check-in Date</label>
-                            <input type="date" name="checkInDate" class="input-field" required>
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 12px; color: var(--text-muted);">Check-out Date</label>
-                            <input type="date" name="checkOutDate" class="input-field" required>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h2 style="margin: 0;">Payment Records</h2>
+                        <div class="search-box" style="width: 300px;">
+                            <input type="text" id="paymentSearchInput"
+                                placeholder="🔍 Search Transaction ID or Guest..." class="input-field"
+                                style="margin: 0; padding-left: 35px;">
                         </div>
                     </div>
-                    <input type="number" name="totalPrice" placeholder="Total Price (LKR)" class="input-field" required
-                        readonly style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
-                </div>
 
-                <div id="modalButtons" style="display: none; gap: 10px; margin-top: 10px;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">Complete Check-in</button>
-                    <button type="button" class="btn" onclick="closeBookingModal()"
-                        style="flex: 1; background: var(--glass);">Cancel</button>
+                    <div class="data-table-container">
+                        <table id="paymentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Ref ID</th>
+                                    <th>Guest</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </form>
-        </div>
-    </div>
+            </div>
 
-    <script src="js/dashboard.js"></script>
-    <script>
-        initDashboard('RECEPTIONIST');
-    </script>
+            <!-- Bill Print Template (Hidden) -->
+            <div id="billTemplate" style="display: none;">
+                <div
+                    style="padding: 40px; font-family: 'Inter', sans-serif; color: #333; max-width: 800px; margin: auto;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #eee; padding-bottom: 30px; margin-bottom: 30px;">
+                        <div>
+                            <h1 style="color: #2563eb; margin: 0; font-size: 28px;">OCEANVIEW RESORT</h1>
+                            <p style="color: #666; font-size: 14px; margin-top: 5px;">123 Paradize Road, Galle, Sri
+                                Lanka</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <h2 style="margin: 0; color: #999;">INVOICE</h2>
+                            <p id="billDate" style="margin: 0; font-weight: 600;"></p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 40px; margin-bottom: 40px;">
+                        <div style="flex: 1;">
+                            <p
+                                style="text-transform: uppercase; font-size: 11px; color: #999; font-weight: 700; margin-bottom: 10px;">
+                                Billed To</p>
+                            <h3 id="billGuestName" style="margin: 0; font-size: 18px;"></h3>
+                            <p id="billGuestEmail" style="margin: 5px 0 0 0; color: #666;"></p>
+                        </div>
+                        <div style="flex: 1;">
+                            <p
+                                style="text-transform: uppercase; font-size: 11px; color: #999; font-weight: 700; margin-bottom: 10px;">
+                                Transaction Details</p>
+                            <p style="margin: 0;"><strong>Method:</strong> <span id="billMethod"></span></p>
+                            <p style="margin: 5px 0 0 0;"><strong>ID:</strong> <span id="billTxID"></span></p>
+                        </div>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+                        <thead>
+                            <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                <th style="padding: 15px; text-align: left;">Description</th>
+                                <th style="padding: 15px; text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 15px; border-bottom: 1px solid #f1f5f9;">Room Booking Payment
+                                    (Room <span id="billRoom"></span>)</td>
+                                <td id="billAmount"
+                                    style="padding: 15px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: 600;">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="text-align: right; border-top: 2px solid #eee; padding-top: 20px;">
+                        <p style="font-size: 14px; color: #666; margin: 0;">Total Amount Paid</p>
+                        <h2 id="billTotal" style="margin: 5px 0 0 0; color: #2563eb; font-size: 32px;"></h2>
+                    </div>
+
+                    <div
+                        style="margin-top: 100px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">
+                        Thank you for staying with us at OceanView Resort!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Page -->
+            <div id="helpPage" class="page" style="display: none;">
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <div class="glass-card"
+                        style="padding: 30px; margin-bottom: 25px; border-left: 5px solid var(--primary);">
+                        <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <span>📖</span> System User Guide
+                        </h2>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Follow these guidelines to manage the
+                            OceanView Resort Reservation System efficiently.</p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                        <!-- Room Management -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <h3
+                                style="color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>🏨</span> Room Management
+                            </h3>
+                            <ul style="padding-left: 20px; line-height: 1.6; color: rgba(255,255,255,0.85);">
+                                <li>Monitor current occupancy in the <strong>Overview</strong> tab.</li>
+                                <li>Use <strong>Room Availability</strong> to check which rooms are ready for new
+                                    guests.</li>
+                                <li>Update room status to <strong>MAINTENANCE</strong> if a room needs cleaning or
+                                    repairs.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Booking Workflow -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <h3
+                                style="color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>📝</span> Guest Bookings
+                            </h3>
+                            <ul style="padding-left: 20px; line-height: 1.6; color: rgba(255,255,255,0.85);">
+                                <li>Click <strong>+ New Booking</strong> to start the registration process.</li>
+                                <li>Search for <strong>Existing Guests</strong> by name or email to save time.</li>
+                                <li>Register new guests by filling out their ID/Passport and contact details.</li>
+                                <li>Total price is calculated automatically based on the room rate and stay duration.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Payments & Billing -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <h3
+                                style="color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>💳</span> Payments & Billing
+                            </h3>
+                            <ul style="padding-left: 20px; line-height: 1.6; color: rgba(255,255,255,0.85);">
+                                <li>A payment record is created <strong>automatically</strong> as soon as a booking is
+                                    confirmed.</li>
+                                <li>Go to <strong>Payments History</strong> to find any transaction.</li>
+                                <li>Search by <strong>Ref ID</strong> (Transaction ID) or Guest Name.</li>
+                                <li>Click <strong>Generate Bill</strong> to view and print the official invoice for the
+                                    guest.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Support -->
+                        <div class="glass-card" style="padding: 25px; background: rgba(37, 99, 235, 0.05);">
+                            <h3
+                                style="color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                                <span>🆘</span> System Support
+                            </h3>
+                            <p style="color: rgba(255,255,255,0.85);">If you encounter technical issues or need access
+                                to restricted features, please contact the <strong>System Administrator</strong>.</p>
+                            <div style="margin-top: 15px; font-size: 13px; color: var(--text-muted);">
+                                <strong>Note:</strong> Log out at the end of your shift to ensure security.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bookingModal" class="modal">
+                <div class="glass-card modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 id="bookingModalTitle">New Guest Booking</h2>
+                        <button type="button" onclick="closeBookingModal()"
+                            style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:24px;">&times;</button>
+                    </div>
+
+                    <form id="bookingForm">
+                        <!-- Guest Selection Section -->
+                        <div class="form-section" style="margin-bottom: 25px;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h3 style="font-size: 16px; margin: 0; color: var(--primary);">1. Guest Information</h3>
+                                <div id="guestStatusBadge" class="badge"
+                                    style="display: none; font-size: 10px; background: var(--primary); padding: 4px 10px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                    Existing Guest</div>
+                            </div>
+
+                            <div class="search-box" style="position: relative; margin-bottom: 10px;">
+                                <input type="text" id="guestSearchInput" placeholder="🔍 Search by name or email..."
+                                    class="input-field"
+                                    style="margin: 0; padding-left: 35px; border-bottom: 2px solid var(--primary); background: rgba(255,255,255,0.02); font-size: 14px;">
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <select name="guestId" id="guestSelect" class="input-field" required size="5"
+                                    style="height: auto; max-height: 150px; border-top: none; border-radius: 0 0 8px 8px; cursor: pointer; background: var(--bg-dark); font-size: 13px;">
+                                    <option value="">-- Results will appear here --</option>
+                                    <option value="NEW" style="font-weight: 700; color: var(--primary); padding: 10px;">
+                                        ✨ NOT
+                                        LISTED? REGISTER NEW GUEST</option>
+                                </select>
+                            </div>
+
+                            <!-- Guest Details Card -->
+                            <div id="guestDetailsCard" class="glass-card"
+                                style="display: none; padding: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass); border-radius: 12px;">
+                                <div id="newGuestIndicator"
+                                    style="display: none; margin-bottom: 15px; color: var(--primary); font-size: 13px; font-weight: 500;">
+                                    ✨ Registering new guest profile
+                                </div>
+
+                                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                                    <div style="flex: 1;">
+                                        <label
+                                            style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">First
+                                            Name</label>
+                                        <input type="text" name="first_name" placeholder="John" class="input-field"
+                                            style="margin: 0; width: 100%;">
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label
+                                            style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Last
+                                            Name</label>
+                                        <input type="text" name="last_name" placeholder="Doe" class="input-field"
+                                            style="margin: 0; width: 100%;">
+                                    </div>
+                                </div>
+
+                                <div style="margin-bottom: 12px;">
+                                    <label
+                                        style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Email
+                                        Address</label>
+                                    <input type="email" name="email" placeholder="email@example.com" class="input-field"
+                                        style="margin: 0; width: 100%;">
+                                </div>
+
+                                <div style="margin-bottom: 12px;">
+                                    <label
+                                        style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Phone
+                                        Number</label>
+                                    <input type="tel" name="phone" placeholder="+94 ..." class="input-field"
+                                        style="margin: 0; width: 100%;">
+                                </div>
+
+                                <div>
+                                    <label
+                                        style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Residential
+                                        Address</label>
+                                    <textarea name="address" placeholder="Street, City..." class="input-field"
+                                        style="margin: 0; width: 100%; min-height: 60px;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Room & Dates -->
+                        <div class="form-section" style="margin-bottom: 25px;">
+                            <h3 style="font-size: 16px; margin-bottom: 10px; color: var(--primary);">2. Stay Details
+                            </h3>
+                            <label
+                                style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">Room
+                                Selection</label>
+                            <select name="roomId" id="roomSelect" class="input-field" required>
+                                <option value="">Select Room</option>
+                            </select>
+                            <div style="display: flex; gap: 10px;">
+                                <div style="flex: 1;">
+                                    <label style="font-size: 12px; color: var(--text-muted);">Check-in Date</label>
+                                    <input type="date" name="checkInDate" id="checkInDate" class="input-field" required>
+                                </div>
+                                <div style="flex: 1;">
+                                    <label style="font-size: 12px; color: var(--text-muted);">Check-out Date</label>
+                                    <input type="date" name="checkOutDate" id="checkOutDate" class="input-field"
+                                        required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card"
+                            style="padding: 20px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-dark);">
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-muted);">Total Price</div>
+                                <div id="displayTotalPrice"
+                                    style="font-weight: 700; color: var(--primary); font-size: 22px;">
+                                    LKR 0.00</div>
+                            </div>
+                            <input type="hidden" name="totalPrice" id="totalPriceInput">
+                            <button type="submit" id="btnSubmitBooking" class="btn btn-primary"
+                                style="padding: 12px 30px;">Confirm & Book</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <script src="js/dashboard.js"></script>
+            <script>
+                initDashboard('RECEPTIONIST');
+            </script>
 </body>
 
 </html>

@@ -14,9 +14,10 @@
         <aside class="sidebar">
             <div class="sidebar-logo">OceanView Admin</div>
             <nav>
-                <a class="nav-item active" data-page="overview">Overview</a>
                 <a class="nav-item" data-page="rooms">Manage Rooms</a>
                 <a class="nav-item" data-page="bookings">All Bookings</a>
+                <a class="nav-item" data-page="payments">Payment History</a>
+                <a class="nav-item" data-page="staff">Manage Staff</a>
             </nav>
             <div style="margin-top: auto;">
                 <button class="btn btn-primary" id="logoutBtn" style="width: 100%;">Logout</button>
@@ -86,6 +87,54 @@
                     </table>
                 </div>
             </div>
+
+            <div id="staffPage" class="page" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Staff Members</h2>
+                    <button class="btn btn-primary" onclick="showAddStaffModal()">+ Add New Staff</button>
+                </div>
+                <div class="glass-card data-table-container">
+                    <table id="staffTable">
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Username</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="paymentsPage" class="page" style="display: none;">
+                <div class="glass-card" style="padding: 25px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h2 style="margin: 0;">Payment History</h2>
+                        <div class="search-box" style="width: 300px;">
+                            <input type="text" id="paymentSearchInput" placeholder="🔍 Search Transaction or Guest..."
+                                class="input-field" style="margin: 0; padding-left: 35px;">
+                        </div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table id="paymentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Ref ID</th>
+                                    <th>Guest</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -116,6 +165,37 @@
             </form>
         </div>
     </div>
+
+    <!-- Staff Modal -->
+    <div id="staffModal" class="modal">
+        <div class="glass-card modal-content">
+            <h2 id="staffModalTitle">Add Staff Member</h2>
+            <form id="staffForm" style="margin-top: 20px;">
+                <input type="hidden" name="id">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="firstName" placeholder="First Name" class="input-field" required
+                        style="flex: 1;">
+                    <input type="text" name="lastName" placeholder="Last Name" class="input-field" required
+                        style="flex: 1;">
+                </div>
+                <input type="email" name="email" placeholder="Email Address" class="input-field" required>
+                <input type="text" name="phone" placeholder="Phone Number" class="input-field">
+                <select name="role" class="input-field" required>
+                    <option value="RECEPTIONIST">Receptionist</option>
+                    <option value="ADMIN">Administrator</option>
+                </select>
+                <input type="text" name="username" placeholder="Username" class="input-field" required>
+                <input type="password" name="password" placeholder="Password (only for new or if changing)"
+                    class="input-field">
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save Staff Member</button>
+                    <button type="button" class="btn" onclick="closeStaffModal()"
+                        style="flex: 1; background: var(--glass);">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script src="js/dashboard.js"></script>
     <script>
