@@ -229,6 +229,74 @@ function initDashboard(role) {
         `).join('');
     }
 
+    function loadGuests(search = '') {
+        console.log('Loading guests...', search);
+        fetch('api/users')
+            .then(res => res.json())
+            .then(data => {
+                state.guests = data;
+                if (search) {
+                    const q = search.toLowerCase();
+                    state.guests = data.filter(g =>
+                        (g.firstName + ' ' + g.lastName).toLowerCase().includes(q) ||
+                        g.email.toLowerCase().includes(q) ||
+                        (g.phone && g.phone.includes(q))
+                    );
+                }
+                if (state.currentPage === 'guests') renderGuestsTable();
+            }).catch(err => console.error('Load Guests failed:', err));
+    }
+
+    function renderGuestsTable() {
+        const tbody = document.querySelector('#guestsTable tbody');
+        if (!tbody) return;
+
+        if (state.guests.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-muted);">No guests found matching your search.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = state.guests.map(g => `
+            <tr>
+                <td>${g.id}</td>
+                <td>
+                    <div style="font-weight: 600;">${g.firstName} ${g.lastName}</div>
+                </td>
+                <td>${g.email}</td>
+                <td>${g.phone || 'N/A'}</td>
+                <td style="font-size: 12px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${g.address || ''}">
+                    ${g.address || 'N/A'}
+                </td>
+                <td>
+                    <button class="btn" onclick="editGuest(${g.id})" style="background: var(--glass); padding: 5px 12px; font-size: 12px;">Edit Details</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    window.editGuest = function (id) {
+        const guest = state.guests.find(g => g.id === id);
+        if (!guest) return;
+
+        const modal = document.getElementById('guestModal');
+        const form = document.getElementById('guestForm');
+        if (!modal || !form) return;
+
+        form.querySelector('input[name="id"]').value = guest.id;
+        form.querySelector('input[name="firstName"]').value = guest.firstName;
+        form.querySelector('input[name="lastName"]').value = guest.lastName;
+        form.querySelector('input[name="email"]').value = guest.email;
+        form.querySelector('input[name="phone"]').value = guest.phone || '';
+        form.querySelector('textarea[name="address"]').value = guest.address || '';
+
+        modal.style.display = 'flex';
+    };
+
+    window.closeGuestModal = function () {
+        const modal = document.getElementById('guestModal');
+        if (modal) modal.style.display = 'none';
+    };
+
     // --- Global Handlers ---
     window.switchPage = function (pageId) {
         state.currentPage = pageId;
@@ -250,9 +318,45 @@ function initDashboard(role) {
         if (pageId === 'rooms' || pageId === 'availability') loadRooms();
         if (pageId === 'bookings') loadBookings();
         if (pageId === 'staff') loadStaff();
-        if (pageId === 'payments') loadPayments(); // Added this line
+        if (pageId === 'payments') loadPayments();
+        if (pageId === 'guests') loadGuests();
         if (pageId === 'overview') updateOverview();
     };
+
+    // Guest Search Listener
+    const guestSearch = document.getElementById('guestMainSearchInput');
+    if (guestSearch) {
+        guestSearch.addEventListener('input', (e) => {
+            loadGuests(e.target.value);
+        });
+    }
+
+    const guestForm = document.getElementById('guestForm');
+    if (guestForm) {
+        guestForm.onsubmit = function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const guestData = {};
+            formData.forEach((value, key) => guestData[key] = value);
+
+            fetch('api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(guestData)
+            }).then(res => res.json()).then(data => {
+                if (data.status === 'success') {
+                    alert('✅ Guest details updated!');
+                    window.closeGuestModal();
+                    loadGuests();
+                } else {
+                    alert('❌ Update failed: ' + (data.message || 'Check connection'));
+                }
+            }).catch(err => {
+                console.error('Guest update error:', err);
+                alert('An error occurred while updating guest.');
+            });
+        };
+    }
 
     // Payment Search listener
     const paySearch = document.getElementById('paymentSearchInput');
@@ -487,13 +591,34 @@ function initDashboard(role) {
         };
 
         if (roomSelect) roomSelect.onchange = calculatePrice;
+        const today = new Date().toISOString().split('T')[0];
         const ci = document.getElementById('checkInDate');
         const co = document.getElementById('checkOutDate');
-        if (ci) ci.onchange = calculatePrice;
-        if (co) co.onchange = calculatePrice;
+        if (ci) {
+            ci.min = today;
+            ci.onchange = calculatePrice;
+        }
+        if (co) {
+            co.min = today;
+            co.onchange = calculatePrice;
+        }
 
         form.onsubmit = function (e) {
             e.preventDefault();
+
+            const checkIn = document.getElementById('checkInDate').value;
+            const checkOut = document.getElementById('checkOutDate').value;
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            if (checkIn < todayStr) {
+                alert('❌ Check-in date cannot be in the past.');
+                return;
+            }
+            if (checkOut <= checkIn) {
+                alert('❌ Check-out date must be after check-in date.');
+                return;
+            }
+
             const formData = new FormData(this);
             const params = new URLSearchParams();
             params.append('action', 'add');
@@ -614,6 +739,12 @@ function initDashboard(role) {
             const formData = new FormData(this);
             const id = formData.get('id');
             const action = id ? 'update' : 'add';
+            const price = parseFloat(formData.get('price'));
+            if (price < 0) {
+                alert('❌ Price per night cannot be negative');
+                return;
+            }
+
             const params = new URLSearchParams();
             params.append('action', action);
             for (let pair of formData.entries()) params.append(pair[0], pair[1]);
@@ -626,7 +757,12 @@ function initDashboard(role) {
                 if (data.success) {
                     window.closeRoomModal();
                     loadRooms();
+                } else {
+                    alert('❌ ' + (data.message || 'Operation failed. Please check inputs.'));
                 }
+            }).catch(err => {
+                console.error('Room operation failed:', err);
+                alert('An error occurred. Please try again.');
             });
         };
     }
