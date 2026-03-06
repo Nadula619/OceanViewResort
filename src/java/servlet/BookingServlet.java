@@ -48,8 +48,25 @@ public class BookingServlet extends HttpServlet {
                         throw new Exception("Check-in and Check-out dates are required.");
                     }
                     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                    booking.setCheckInDate(sdf.parse(ci));
-                    booking.setCheckOutDate(sdf.parse(co));
+                    java.util.Date checkInDate = sdf.parse(ci);
+                    java.util.Date checkOutDate = sdf.parse(co);
+
+                    java.util.Calendar cal = java.util.Calendar.getInstance();
+                    cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                    cal.set(java.util.Calendar.MINUTE, 0);
+                    cal.set(java.util.Calendar.SECOND, 0);
+                    cal.set(java.util.Calendar.MILLISECOND, 0);
+                    java.util.Date today = cal.getTime();
+
+                    if (checkInDate.before(today)) {
+                        throw new Exception("Check-in date cannot be in the past.");
+                    }
+                    if (checkOutDate.before(checkInDate) || checkOutDate.equals(checkInDate)) {
+                        throw new Exception("Check-out date must be after check-in date.");
+                    }
+
+                    booking.setCheckInDate(checkInDate);
+                    booking.setCheckOutDate(checkOutDate);
                 } catch (java.text.ParseException e) {
                     throw new Exception("Invalid date format. Please use YYYY-MM-DD.");
                 }

@@ -11,6 +11,40 @@ import model.Room;
 import util.DBConnection;
 
 public class RoomDAO {
+
+    public boolean isRoomNumberExists(String roomNumber) {
+        String sql = "SELECT COUNT(*) FROM rooms WHERE room_number = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, roomNumber);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isRoomNumberExists(String roomNumber, int excludeId) {
+        String sql = "SELECT COUNT(*) FROM rooms WHERE room_number = ? AND id != ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, roomNumber);
+            pstmt.setInt(2, excludeId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public List<Room> getAllRooms() {
         List<Room> rooms = new ArrayList<>();
         String sql = "SELECT * FROM rooms";

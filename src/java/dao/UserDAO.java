@@ -11,10 +11,26 @@ import model.User;
 import util.DBConnection;
 
 public class UserDAO {
+    private Connection connection;
+
+    public UserDAO() {
+    }
+
+    public UserDAO(Connection connection) {
+        this.connection = connection;
+    }
+
+    private Connection getConnection() throws Exception {
+        if (connection != null && !connection.isClosed()) {
+            return connection;
+        }
+        return DBConnection.getInstance().getConnection();
+    }
+
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
-        try (Connection conn = DBConnection.getInstance().getConnection();
+        try (Connection conn = getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -29,7 +45,7 @@ public class UserDAO {
 
     public User getUserByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = ?";
-        try (Connection conn = DBConnection.getInstance().getConnection();
+        try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -53,6 +69,25 @@ public class UserDAO {
             pstmt.setString(3, user.getEmail());
             pstmt.setString(4, user.getPhone());
             pstmt.setString(5, user.getAddress());
+
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateUser(User user) {
+        String sql = "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ? WHERE id = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, user.getFirstName());
+            pstmt.setString(2, user.getLastName());
+            pstmt.setString(3, user.getEmail());
+            pstmt.setString(4, user.getPhone());
+            pstmt.setString(5, user.getAddress());
+            pstmt.setInt(6, user.getId());
 
             return pstmt.executeUpdate() > 0;
         } catch (Exception e) {

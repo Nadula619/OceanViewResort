@@ -42,6 +42,7 @@ public class AuthServlet extends HttpServlet {
                 result.put("success", true);
                 result.put("role", authenticatedStaff.getRole());
                 result.put("name", authenticatedStaff.getFullName());
+                result.put("staffId", authenticatedStaff.getStaffId());
             } else {
                 result.put("success", false);
                 result.put("message", "Invalid username or password");
@@ -73,6 +74,7 @@ public class AuthServlet extends HttpServlet {
             result.put("loggedIn", true);
             result.put("role", staff.getRole());
             result.put("name", staff.getFullName());
+            result.put("staffId", staff.getStaffId());
         } else {
             result.put("loggedIn", false);
         }

@@ -56,8 +56,9 @@ CREATE TABLE IF NOT EXISTS bookings (
 -- Insert sample staff data
 INSERT INTO staff (first_name, last_name, email, phone, role, username, password) VALUES 
 ('System', 'Admin', 'admin@oceanview.com', '123-456-7890', 'ADMIN', 'admin', 'admin123'),
-('Sarah', 'Johnson', 'sarah@oceanview.com', '123-456-7891', 'RECEPTIONIST', 'receptionist', 'staff123'),
-('Mike', 'Thompson', 'mike@oceanview.com', '123-456-7892', 'RECEPTIONIST', 'mike_desk', 'staff123');
+('System', 'Receptionist', 'Receptionist@gmail.com', '0779096345', 'RECEPTIONIST', 'receptionist', 'Receptionist 
+123'),
+
 
 -- Insert sample guest data
 INSERT INTO users (first_name, last_name, email, phone, address) VALUES 
