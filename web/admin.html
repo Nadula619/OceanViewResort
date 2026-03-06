@@ -18,6 +18,7 @@
                 <a class="nav-item" data-page="rooms">Manage Rooms</a>
                 <a class="nav-item" data-page="bookings">All Bookings</a>
                 <a class="nav-item" data-page="payments">Payment History</a>
+                <a class="nav-item" data-page="guests">Manage Guests</a>
                 <a class="nav-item" data-page="staff">Manage Staff</a>
             </nav>
             <div style="margin-top: auto;">
@@ -136,6 +137,36 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Guests Page -->
+            <div id="guestsPage" class="page" style="display: none;">
+                <div class="glass-card" style="padding: 25px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h2 style="margin: 0;">Guest Directory</h2>
+                        <div class="search-box" style="width: 300px;">
+                            <input type="text" id="guestMainSearchInput" placeholder="🔍 Search Name, Email or Phone..."
+                                class="input-field" style="margin: 0; padding-left: 35px;">
+                        </div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table id="guestsTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -191,6 +222,52 @@
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Save Staff Member</button>
                     <button type="button" class="btn" onclick="closeStaffModal()"
+                        style="flex: 1; background: var(--glass);">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Guest Modal -->
+    <div id="guestModal" class="modal">
+        <div class="glass-card modal-content" style="max-width: 600px;">
+            <h2 id="guestModalTitle">Edit Guest Details</h2>
+            <form id="guestForm" style="margin-top: 20px;">
+                <input type="hidden" name="id">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div style="flex: 1;">
+                        <label
+                            style="display: block; margin-bottom: 5px; font-size: 14px; color: var(--text-muted);">First
+                            Name</label>
+                        <input type="text" name="firstName" class="input-field" required style="margin: 0;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label
+                            style="display: block; margin-bottom: 5px; font-size: 14px; color: var(--text-muted);">Last
+                            Name</label>
+                        <input type="text" name="lastName" class="input-field" required style="margin: 0;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px; color: var(--text-muted);">Email
+                        Address</label>
+                    <input type="email" name="email" class="input-field" required style="margin: 0;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px; color: var(--text-muted);">Phone
+                        Number</label>
+                    <input type="text" name="phone" class="input-field" style="margin: 0;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label
+                        style="display: block; margin-bottom: 5px; font-size: 14px; color: var(--text-muted);">Residential
+                        Address</label>
+                    <textarea name="address" class="input-field" style="margin: 0; min-height: 80px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Update Guest Profile</button>
+                    <button type="button" class="btn" onclick="closeGuestModal()"
                         style="flex: 1; background: var(--glass);">Cancel</button>
                 </div>
             </form>

@@ -53,7 +53,16 @@ public class StaffServlet extends HttpServlet {
             success = staffDAO.updateStaff(staff);
         } else if ("delete".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
-            success = staffDAO.deleteStaff(id);
+
+            // Prevent self-deletion
+            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            model.Staff currentUser = (session != null) ? (model.Staff) session.getAttribute("user") : null;
+
+            if (currentUser != null && currentUser.getStaffId() == id) {
+                success = false;
+            } else {
+                success = staffDAO.deleteStaff(id);
+            }
         }
 
         response.setContentType("application/json");
