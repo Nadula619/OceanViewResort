@@ -34,4 +34,22 @@ public class UserServlet extends HttpServlet {
             response.getWriter().print(gson.toJson(userDAO.getAllUsers()));
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        try {
+            User user = gson.fromJson(request.getReader(), User.class);
+            if (userDAO.updateUser(user)) {
+                response.getWriter().print("{\"status\": \"success\", \"message\": \"Guest updated successfully\"}");
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().print("{\"status\": \"error\", \"message\": \"Failed to update guest\"}");
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("{\"status\": \"error\", \"message\": \"" + e.getMessage() + "\"}");
+        }
+    }
 }

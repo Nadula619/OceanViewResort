@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Room;
 
-@WebServlet(name = "RoomServlet", urlPatterns = {"/api/rooms"})
+@WebServlet(name = "RoomServlet", urlPatterns = { "/api/rooms" })
 public class RoomServlet extends HttpServlet {
     private RoomDAO roomDAO = new RoomDAO();
     private Gson gson = new Gson();
@@ -30,30 +30,60 @@ public class RoomServlet extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         boolean success = false;
+        String message = "";
 
         if ("add".equals(action)) {
-            Room room = new Room();
-            room.setRoomNumber(request.getParameter("roomNumber"));
-            room.setRoomType(request.getParameter("roomType"));
-            room.setPricePerNight(Double.parseDouble(request.getParameter("price")));
-            room.setStatus(request.getParameter("status"));
-            room.setDescription(request.getParameter("description"));
-            success = roomDAO.addRoom(room);
+            String roomNumber = request.getParameter("roomNumber");
+            String priceStr = request.getParameter("price");
+            double price = (priceStr != null && !priceStr.isEmpty()) ? Double.parseDouble(priceStr) : -1;
+
+            if (roomDAO.isRoomNumberExists(roomNumber)) {
+                success = false;
+                message = "Room number already exists";
+            } else if (price < 0) {
+                success = false;
+                message = "Price per night cannot be negative";
+            } else {
+                Room room = new Room();
+                room.setRoomNumber(roomNumber);
+                room.setRoomType(request.getParameter("roomType"));
+                room.setPricePerNight(price);
+                room.setStatus(request.getParameter("status"));
+                room.setDescription(request.getParameter("description"));
+                success = roomDAO.addRoom(room);
+                if (!success)
+                    message = "Failed to add room.";
+            }
         } else if ("update".equals(action)) {
-            Room room = new Room();
-            room.setId(Integer.parseInt(request.getParameter("id")));
-            room.setRoomNumber(request.getParameter("roomNumber"));
-            room.setRoomType(request.getParameter("roomType"));
-            room.setPricePerNight(Double.parseDouble(request.getParameter("price")));
-            room.setStatus(request.getParameter("status"));
-            room.setDescription(request.getParameter("description"));
-            success = roomDAO.updateRoom(room);
+            int id = Integer.parseInt(request.getParameter("id"));
+            String roomNumber = request.getParameter("roomNumber");
+            String priceStr = request.getParameter("price");
+            double price = (priceStr != null && !priceStr.isEmpty()) ? Double.parseDouble(priceStr) : -1;
+
+            if (roomDAO.isRoomNumberExists(roomNumber, id)) {
+                success = false;
+                message = "Room number already exists";
+            } else if (price < 0) {
+                success = false;
+                message = "Price per night cannot be negative";
+            } else {
+                Room room = new Room();
+                room.setId(id);
+                room.setRoomNumber(roomNumber);
+                room.setRoomType(request.getParameter("roomType"));
+                room.setPricePerNight(price);
+                room.setStatus(request.getParameter("status"));
+                room.setDescription(request.getParameter("description"));
+                success = roomDAO.updateRoom(room);
+                if (!success)
+                    message = "Failed to update room.";
+            }
         } else if ("delete".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
             success = roomDAO.deleteRoom(id);
         }
 
         response.setContentType("application/json");
-        response.getWriter().print("{\"success\":" + success + "}");
+        response.getWriter().print("{\"success\":" + success + ", \"message\": \"" + message + "\"}");
     }
 }
